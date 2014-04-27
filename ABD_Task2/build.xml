@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+
+     ABD_Task2    
+     Ant stub si oracle connection stub project
+                   
+     heri                                                                
+     ====================================================================== -->
+
+<project name="ABD_Task2" default="build">
+    <description>
+    	Insereaza date intr-o tabela.
+    </description>
+
+	<!-- ===================== Buildnumber =========================== -->
+	<buildnumber file="mybuild.number"/>	
+	
+	<!-- ===================== Property Definitions =========================== -->
+    <property file="build.properties"/>
+	
+	<!-- ==================== File and Directory Names ======================== -->
+	<property name="app.name"      value="(set this in build.properties!)"/>
+	<property name="app.version"   value="(set this in build.properties!)"/>
+	<property name="build.home"    value="build"/>
+	<property name="dist.home"     value="dist"/>
+	<property name="src.home"      value="src"/>
+	<property name="lib.home"      value="lib"/>
+	
+	<!--  ==================== Compilation Control Options ==================== -->	
+	<property name="compile.debug"       value="true"/>
+	<property name="compile.deprecation" value="false"/>
+	<property name="compile.optimize"    value="true"/>		
+	
+	<!-- ==================== External Dependencies =========================== -->
+	<property name="ojdbc6.jar" value="(set this in build.properties!)"/>
+
+
+	<!-- ==================== Compilation and Run Classpath =================== -->		
+	<path id="compile.classpath">
+	    <fileset dir="${lib.dir}" includes="*.jar"/>		
+	</path>	
+	<path id="run.classpath">
+		<pathelement path="${build.dir}"/>
+		<fileset dir="${lib.dir}" includes="*.jar"/>		
+	</path>		
+			
+	<!-- =================================
+		  tstamp this
+		 ================================= -->
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+		<format property="serial" pattern="yyMMdd"/>
+	</tstamp>
+
+	
+    <!-- ================================= 
+          target: all              
+         ================================= -->
+    <target name="all" depends="clean, build" 
+    	description="Clean build and dist, then compile"/>
+
+			
+    		
+    <!-- ================================= 
+          target: clean              
+         ================================= -->
+    <target name="clean" description="Delete old build and dist directories">
+        <delete dir="${build.home}"/>
+        <delete dir="${dist.home}"/>
+    </target>
+	
+	
+	
+    <!-- ================================= 
+          target: build              
+         ================================= -->
+    <target name="build" depends="" description="Build everything">
+        <mkdir  dir="${build.home}"/>
+    	
+    	<!-- Build me -->
+        <mkdir    dir="${build.home}"/>
+        <javac destdir="${build.home}"
+			source = "1.6"
+        	target = "1.6"
+        	includeantruntime = "false"
+	         debug ="${compile.debug}"
+       deprecation = "${compile.deprecation}"
+		  optimize = "${compile.optimize}">
+        	<src path="src"/> 
+		  	<classpath refid="compile.classpath"/>
+        </javac>        	    	
+    </target>
+
+	<!-- ================================= 
+          target: run              
+         ================================= -->
+    <target name="run" depends="build" description="Run this stuff ... really">
+        <java classname="ro.abd.task2.Main" fork="true">
+                <classpath refid="run.classpath"/>
+		</java> 
+    </target>
+	
+	
+    <!-- ================================= 
+          target: dist              
+         ================================= -->
+    <target name="dist" depends="build" description="Take me to your leader! JAR me up.">
+        <delete dir="${dist.home}"/>
+
+        <copy    todir="${dist.home}">
+          <fileset dir="${lib.home}" />
+        </copy>
+
+       <manifest file="MANIFEST.MF">
+           <attribute name="Built-By" value="${user.name}"/>
+           <attribute name="Main-Class" value="ro.abd.task2.Main"/>
+           <attribute name="Implementation-Version" 
+                      value="${app.version}-b${build.number}"/>   
+           <attribute name="Built-Date" value="${TODAY}"/>                 
+           <attribute name="Class-Path" value="ojdbc6.jar"/>                 
+       </manifest>
+
+       <jar destfile="${dist.home}/${app.name}.jar"
+            basedir="${build.home}"
+            includes="**/*.class"
+            manifest="MANIFEST.MF"/>
+	
+	<delete file="MANIFEST.MF"/>
+    </target>
+</project>
+
